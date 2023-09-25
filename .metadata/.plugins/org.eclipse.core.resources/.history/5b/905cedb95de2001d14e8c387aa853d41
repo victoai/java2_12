@@ -1,0 +1,74 @@
+package chatt;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Scanner;
+
+public class ServerEx01{
+	ServerSocket serverSocket;
+	Socket clientSocket;
+	DataInputStream dataInputStream;
+	DataOutputStream dataOutputStream;
+	public ServerEx01(){
+		try {
+			serverSocket =new ServerSocket(6500);
+			System.out.println("서버 만들기 성공");
+			clientSocket=serverSocket.accept();
+			System.out.println( "연결성공");
+			
+			dataInputStream =new DataInputStream(clientSocket.getInputStream());
+			dataOutputStream=new DataOutputStream(clientSocket.getOutputStream());
+		} catch (Exception e) {
+			// TODO: handle exception
+			
+			receiveMsg();
+			
+			sendMsg();
+		}
+	}	
+	
+	public void sendMsg() {
+		Scanner sc=new Scanner(System.in);
+		
+		Thread t=new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					while(true) {
+						System.out.println("서버:");
+						String msg=sc.nextLine();
+						dataOutputStream.writeUTF(msg);
+					}
+					
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			}
+		});
+		t.start();
+	}
+	public void receiveMsg() {
+		Thread t=new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					while(true){
+					String msg=dataInputStream.readUTF();
+					System.out.println(msg);}
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+			}
+		});
+		t.start();
+	}
+	public static void main(String[] args) {
+		new ServerEx01();
+	}
+}

@@ -1,0 +1,92 @@
+package chat1;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Scanner;
+
+public class ClientEx01 {
+
+	Socket socket;
+
+	DataInputStream dataInputStream; // 보조스트림 in
+	DataOutputStream dataOutputStream;// 보조스트림 out
+
+	public ClientEx01() {
+
+		try {// 서버의 ip , 포트번호
+			socket = new Socket("localhost", 6500);
+
+			dataInputStream = new DataInputStream(socket.getInputStream());
+			dataOutputStream = new DataOutputStream(socket.getOutputStream());
+
+			
+			// 받기
+			
+			
+			// 보내기
+			sendMsg();
+			
+			receiveMsg();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void sendMsg() {
+
+		Scanner sc = new Scanner(System.in);
+
+		Thread t = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					while (true) {
+						System.out.println("메세지 작성");
+						String msg = sc.nextLine();
+						dataOutputStream.writeUTF(msg);
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+
+				}
+			}
+
+		});
+		t.start();
+	}
+
+	private void receiveMsg() {
+
+		Thread t = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				try {
+					while (true) {
+						String msg;
+						msg = dataInputStream.readUTF();
+						System.out.println(msg);
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+		});
+		t.start();
+
+	}
+
+	public static void main(String[] args) {
+		new ClientEx01();
+	}
+}
